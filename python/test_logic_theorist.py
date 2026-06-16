@@ -1,14 +1,13 @@
 """
-Tests for the Logic Theorist.
-
-These check three things:
+tests for the Logic Theorist.
+these check three things:
   1. The parser and printer round-trip.
   2. The matcher is sound (a successful match yields a literal instance).
   3. Every proof the prover emits is *valid* — we re-check each proof step
      independently (substitution = instance; detachment = modus ponens;
      chaining = syllogism), so a buggy search can never pass the tests.
 
-Run with:  python -m unittest test_logic_theorist   (or: python test_logic_theorist.py)
+run with:  python -m unittest test_logic_theorist   (or: python test_logic_theorist.py)
 """
 
 import unittest
