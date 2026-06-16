@@ -1,15 +1,13 @@
 """
-Demonstration: watch the Logic Theorist work through a sequence of theorems
-from *Principia Mathematica* Chapter 2, accumulating results as it goes — the
-way the original program did in 1956.
+the Logic Theorist from Principia Mathematica Chapter 2
 
-Run with:  python demo.py
+run with:  python demo.py
 """
 
 from logic_theorist import LogicTheorist, parse
 
 
-# A small "curriculum" of theorems. Each is proved using only the five axioms
+# small "curriculum" of theorems. each is proved using only the five axioms
 # plus whatever has already been proved, then added to the knowledge base.
 PROGRAM = [
     ("2.05", "(q -> r) -> ((p -> q) -> (p -> r))", "syllogism (one form)"),
