@@ -1,0 +1,17 @@
+[package]
+name = "logic_theorist"
+version = "0.1.0"
+edition = "2021"
+description = "A faithful re-creation of the 1956 Logic Theorist (Newell, Shaw & Simon)"
+license = "MIT"
+
+[[bin]]
+name = "logic_theorist"
+path = "src/main.rs"
+
+[lib]
+name = "logic_theorist"
+path = "src/lib.rs"
+
+[dependencies]
+# none — standard library only
