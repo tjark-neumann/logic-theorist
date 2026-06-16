@@ -155,4 +155,4 @@ of the IPL-II code:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT.
