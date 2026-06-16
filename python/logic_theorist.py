@@ -1,33 +1,34 @@
 """
-Logic Theorist — a faithful re-creation of the 1956 program by
-Allen Newell, Cliff Shaw, and Herbert Simon, often called the first
-artificial-intelligence program.
+logic theorist 
+a re-creation of the 1956 program by
+Allen Newell, Cliff Shaw, and Herbert Simon
+the first artificial-intelligence program
 
-The original proved theorems of propositional logic taken from Chapter 2 of
-Whitehead & Russell's *Principia Mathematica* (PM). It worked from five axioms
+the original proved theorems of propositional logic taken from Chapter 2 of
+Whitehead & Russell's PM. it worked from five axioms
 and three rules of inference, searching for proofs with a handful of heuristic
-"methods." This implementation reproduces that machinery:
+methods. this implementation reproduces that machinery:
 
-Primitive connectives (as in PM):  negation (~)  and  disjunction (|)
-Implication is defined:            a -> b   ==   ~a | b      (the "Replacement" rule)
+primitive connectives (as in PM):  negation (~)  and  disjunction (|)
+implication is defined:            a -> b   ==   ~a | b      (the "Replacement" rule)
 
-Rules of inference:
-    Substitution  — uniformly replace a variable by any formula
-    Replacement   — swap a connective for its definition (handled by normalising
+rules of inference:
+    substitution  — uniformly replace a variable by any formula
+    replacement   — swap a connective for its definition (handled by normalising
                     everything to the ~/| primitives)
-    Detachment    — from  A  and  A -> B  infer  B   (modus ponens)
+    detachment    — from  A  and  A -> B  infer  B   (modus ponens)
 
-Search methods (exactly the four the original used):
-    Substitution method  — is the goal an instance of a known theorem?
-    Detachment method    — find a theorem  A -> goal,  then prove  A
-    Forward chaining     — to prove a -> c, find a -> b, then prove b -> c
-    Backward chaining     — to prove a -> c, find b -> c, then prove a -> b
+search methods (exactly the four the original used):
+    substitution method  — is the goal an instance of a known theorem?
+    detachment method    — find a theorem  A -> goal,  then prove  A
+    forward chaining     — to prove a -> c, find a -> b, then prove b -> c
+    backward chaining     — to prove a -> c, find b -> c, then prove a -> b
         (chaining is justified by the syllogism principle, PM *2.06)
 
-Newly proved theorems are added to the knowledge base and reused, just as the
+newly proved theorems are added to the knowledge base and reused, just as the
 original LT accumulated results while working through PM Chapter 2.
 
-This module has no dependencies beyond the standard library.
+this module has no dependencies beyond the standard library.
 """
 
 from __future__ import annotations
@@ -36,15 +37,12 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Iterable
 
 
-# ---------------------------------------------------------------------------
-# Expressions
-#
-# The internal representation uses only the PM primitives: variables, negation,
-# and disjunction. Implication is sugar that the parser expands and the printer
-# re-sugars, which is how the "Replacement" rule is realised — every formula
+# the internal representation uses only the PM primitives: variables, negation,
+# and disjunction. implication is sugar that the parser expands and the printer
+# re-sugars, which is how the "Replacement" rule is realised. every formula
 # already lives in primitive form, so a -> b and ~a | b are literally the same
 # object and need no run-time conversion.
-# ---------------------------------------------------------------------------
+
 
 
 class Expr:
@@ -95,13 +93,11 @@ def _paren(inner: Expr, outer: Expr) -> str:
     return str(inner)
 
 
-# Convenience variables
+# convenience variables
 P, Q, R, S = Var("p"), Var("q"), Var("r"), Var("s")
 
 
-# ---------------------------------------------------------------------------
-# Substitution and one-way pattern matching
-# ---------------------------------------------------------------------------
+# substitution and one-way pattern matching
 
 Subst = Dict[str, Expr]
 
@@ -169,9 +165,7 @@ def is_implication(expr: Expr) -> Optional[Tuple[Expr, Expr]]:
     return None
 
 
-# ---------------------------------------------------------------------------
-# Proofs
-# ---------------------------------------------------------------------------
+# proofs
 
 
 @dataclass
@@ -202,9 +196,7 @@ class Proof:
         return 1 + sum(p.step_count() for p in self.premises)
 
 
-# ---------------------------------------------------------------------------
-# Knowledge base
-# ---------------------------------------------------------------------------
+# knowledge base
 
 
 @dataclass
@@ -213,7 +205,7 @@ class Theorem:
     statement: Expr
 
 
-# The five axioms of PM propositional calculus that LT was given, written in
+# the five axioms of PM propositional calculus that LT was given, written in
 # primitive ~/| form (implication shown in comments).
 def axioms() -> List[Theorem]:
     return [
@@ -230,9 +222,7 @@ def axioms() -> List[Theorem]:
     ]
 
 
-# ---------------------------------------------------------------------------
-# The Logic Theorist
-# ---------------------------------------------------------------------------
+# the Logic Theorist
 
 
 class LogicTheorist:
@@ -244,7 +234,7 @@ class LogicTheorist:
         self.max_depth = max_depth
         self._gensym = 0
 
-    # -- public API --------------------------------------------------------
+    # -- public API
 
     def prove(self, goal: Expr, max_depth: Optional[int] = None) -> Optional[Proof]:
         """Attempt to prove `goal`. Returns a Proof tree or None.
@@ -268,7 +258,7 @@ class LogicTheorist:
             self.theorems.append(Theorem(name, goal))
         return proof
 
-    # -- search ------------------------------------------------------------
+    # -- search
 
     def _fresh(self) -> str:
         self._gensym += 1
@@ -279,7 +269,7 @@ class LogicTheorist:
             return None
         seen = seen | {goal}
 
-        # 1) Substitution method (base case): is the goal an instance of a
+        # 1) substitution method (base case): is the goal an instance of a
         #    known axiom or theorem?
         proof = self._substitution_method(goal)
         if proof is not None:
@@ -288,12 +278,12 @@ class LogicTheorist:
         if depth <= 0:
             return None
 
-        # 2) Detachment method.
+        # 2) detachment method.
         proof = self._detachment_method(goal, depth, seen)
         if proof is not None:
             return proof
 
-        # 3) Chaining (only meaningful when the goal is itself an implication).
+        # 3) chaining (only meaningful when the goal is itself an implication).
         imp = is_implication(goal)
         if imp is not None:
             a, c = imp
@@ -314,7 +304,7 @@ class LogicTheorist:
 
     def _detachment_method(self, goal: Expr, depth: int,
                            seen: frozenset) -> Optional[Proof]:
-        # Look for a theorem  A -> B  whose consequent B matches the goal;
+        # look for a theorem  A -> B  whose consequent B matches the goal;
         # then it suffices to prove the (substituted) antecedent A.
         for thm in self.theorems:
             stmt = rename_apart(thm.statement, self._fresh())
@@ -336,7 +326,7 @@ class LogicTheorist:
 
     def _forward_chaining(self, a: Expr, c: Expr, depth: int,
                           seen: frozenset) -> Optional[Proof]:
-        # Goal  a -> c.  Find theorem  a -> b,  then prove  b -> c.
+        # goal  a -> c.  Find theorem  a -> b,  then prove  b -> c.
         for thm in self.theorems:
             stmt = rename_apart(thm.statement, self._fresh())
             imp = is_implication(stmt)
@@ -358,7 +348,7 @@ class LogicTheorist:
 
     def _backward_chaining(self, a: Expr, c: Expr, depth: int,
                            seen: frozenset) -> Optional[Proof]:
-        # Goal  a -> c.  Find theorem  b -> c,  then prove  a -> b.
+        # goal  a -> c.  Find theorem  b -> c,  then prove  a -> b.
         for thm in self.theorems:
             stmt = rename_apart(thm.statement, self._fresh())
             imp = is_implication(stmt)
@@ -379,7 +369,6 @@ class LogicTheorist:
         return None
 
 
-# ---------------------------------------------------------------------------
 # A tiny parser, so theorems can be written as strings.
 #
 # Grammar (precedence: ~ tightest, then |, then ->, right-associative):
@@ -389,7 +378,6 @@ class LogicTheorist:
 #     unary  := '~' unary | atom
 #     atom   := IDENT | '(' expr ')'
 # Accepts ascii (~ | ->) and unicode (¬ ∨ ⊃ →) interchangeably.
-# ---------------------------------------------------------------------------
 
 
 def parse(text: str) -> Expr:
